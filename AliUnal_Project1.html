@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1 {
+            font-size: 27px;
+            color: #61960c;
+            text-align: left;
+        }
+
+        .pokemon-info {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 18px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            font-size: 18px;
+            padding: 5px;
+            width: 150px;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .pokemon-details {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .pokemon-details img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
+    <script>
+        // Storing the Pokemon data
+        var pokemonData = null;
+
+        // Tracking the pokemon we are currently showing
+        var pokemonId = 0;
+
+        // To getting JSON data from a URL
+        function getJSONSync(url) { 
+            var resp;
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("GET", url, false);
+            xmlHttp.send();
+            resp = xmlHttp.responseText;
+            return JSON.parse(resp);
+        }
+
+        // Getting data from url
+        function getDataSync() {
+            if (!pokemonData) {
+                var url = "https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json";
+                pokemonData = getJSONSync(url);
+            }
+            return pokemonData;
+        }
+
+        // To finding a pokemon with a specific ID
+        function retrievePokemonData() { 
+            var data = getDataSync();
+            var id = document.getElementById('pokemonId').value;
+
+            var pokemon = null;
+            for (var i = 0; i < data.pokemon.length; i++) {
+                if (data.pokemon[i].id == id) {
+                    pokemon = data.pokemon[i];
+                    break;
+                }
+            }
+
+            // Showing the pokemon information if it was found, otherwise it will be clear
+            if (pokemon) { 
+                populatePokemonInfo(pokemon);
+            } else {
+                clearPokemonInfo();
+            }
+        }
+
+        //Function to the filling information about a pokemon
+        function populatePokemonInfo(pokemon) {
+            document.getElementById('pokemonNumber').textContent = pokemon.num;
+            document.getElementById('pokemonName').textContent = pokemon.name;
+            document.getElementById('pokemonHeight').textContent = pokemon.height;
+            document.getElementById('pokemonWeight').textContent = pokemon.weight;
+            document.getElementById('pokemonImage').src = pokemon.img;
+            document.getElementById('pokemonId').value = pokemon.id;
+        }
+
+        // Function to clearing all the pokemon information.
+        function clearPokemonInfo() { 
+            document.getElementById('pokemonNumber').textContent = '';
+            document.getElementById('pokemonName').textContent = '';
+            document.getElementById('pokemonHeight').textContent = '';
+            document.getElementById('pokemonWeight').textContent = '';
+            document.getElementById('pokemonImage').src = '';
+            document.getElementById('pokemonId').value = '';
+        }
+
+        // Showing the next pokemon
+        function nextPokemon() {
+            var data = getDataSync();
+            pokemonId = parseInt(document.getElementById('pokemonId').value);
+            pokemonId++;
+
+            if (pokemonId > data.pokemon.length) {
+                pokemonId = 1;
+            }
+
+            var pokemon = null;
+            for (var i = 0; i < data.pokemon.length; i++) {
+                if (data.pokemon[i].id == pokemonId) {
+                    pokemon = data.pokemon[i];
+                    break;
+                }
+            }
+
+            if (pokemon) {
+                populatePokemonInfo(pokemon);
+            } else {
+                clearPokemonInfo();
+            }
+        }
+
+        // Showing the previous pokemon
+        function previousPokemon() {
+            var data = getDataSync();
+            pokemonId = parseInt(document.getElementById('pokemonId').value);
+            pokemonId--;
+
+            if (pokemonId < 1) {
+                pokemonId = data.pokemon.length;
+            }
+
+            var pokemon = null;
+            for (var i = 0; i < data.pokemon.length; i++) {
+                if (data.pokemon[i].id == pokemonId) {
+                    pokemon = data.pokemon[i];
+                    break;
+                }
+            }
+
+            if (pokemon) {
+                populatePokemonInfo(pokemon);
+            } else {
+                clearPokemonInfo();
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Pokemon Information</h1>
+  
+    <div class="pokemon-info">
+        <label for="pokemonId">Pokemon ID:</label>
+        <input type="text" id="pokemonId" />
+        <button onclick="retrievePokemonData();">Retrieve</button>
+        <button onclick="clearPokemonInfo();">Clear Info</button>
+    </div>
+  
+    <div class="pokemon-info">
+        <label for="pokemonNumber">Pokemon Number:</label>
+        <span id="pokemonNumber" class="pokemon-details"></span>
+    </div>
+  
+    <div class="pokemon-info" id="Name">
+        <label for="pokemonName">Name:</label>
+        <span id="pokemonName" class="pokemon-details"></span>
+    </div>
+  
+    <div class="pokemon-info">
+        <label for="pokemonHeight">Height:</label>
+        <span id="pokemonHeight" class="pokemon-details"></span>
+    </div>
+  
+    <div class="pokemon-info">
+        <label for="pokemonWeight">Weight:</label>
+        <span id="pokemonWeight" class="pokemon-details"></span>
+    </div>
+  
+    <div class="pokemon-info">
+        <label for="pokemonImage">Image:</label>
+        <img id="pokemonImage" class="pokemon-details" src=""/>
+    </div>
+
+    <div class="pokemon-info">
+        <input type="button" value="Next Pokemon" id="btn" onclick="nextPokemon();">
+    </div>
+
+    <div class="pokemon-info">
+        <input type="button" value="Previous Pokemon" id="btn" onclick="previousPokemon();">
+    </div>
+    
+</body>
+</html>
